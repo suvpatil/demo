@@ -1,0 +1,44 @@
+{% extends "base-login.html" %}
+
+{% block content %}
+
+				<form class="login100-form validate-form" action="" method="post">
+					{{ form.hidden_tag() }}
+					<!-- Logo -->
+					<div class="login-logo">        
+						<img src="static/img/HSBC_Logo.png" alt="AVATAR">
+					</div>
+					<!-- /Logo -->
+					<!-- Logo -->
+					<div class="login-logo">
+						<span><h2 class="login-title">Digital Vault</h2></span>
+					</div>
+					<!-- /Logo -->
+					
+					<div class="wrap-input100 validate-input m-b-10" data-validate = "Username is required">
+						<br>
+						{{ form.username(class="input100", placeholder="Username", size=36) }}
+					</div>
+
+					<div class="wrap-input100 validate-input m-b-10" data-validate = "Password is required">
+						{{ form.password(class="input100", placeholder="Password", size=36) }}
+					</div>
+
+					<div class="container-login100-form-btn p-t-10">
+						{{ form.login(class="login100-form-btn") }}
+					</div>
+
+					<div class="text-center w-full">
+						<br>
+						<br>
+						<a class="txt1" href="{{ url_for('register') }}">
+							Create new account
+							<i class="fa fa-long-arrow-right"></i>						
+						</a>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+	{% endblock %}

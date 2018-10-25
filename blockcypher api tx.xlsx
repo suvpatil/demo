@@ -1,0 +1,32 @@
+'block_height': None
+'block_index': -1
+'hash': '2bd70847501a3398038da91e2a441410bd5c3fe06f7b4a00a8dc5bf9c6c1842f'
+'addresses': ['mrTfNVicJBj15GiaW1a8Gu8CDGJLSshNHW', 'myCwGajvhU9EYGRc9g14ygaAZDxfyNgtDi', 'n1Zi77qHQtGQHn65SSaaEVp2hpXS9kdwdK']
+'total': 71799963566
+'fees': 113000
+'size': 226
+'preference': 'high'
+'relayed_by': '206.189.205.238:18333'
+'received': datetime.datetime(2018, 6, 26, 9, 44, 44, 856000, tzinfo=tzutc())
+'ver': 2
+'lock_time': 1326399
+'double_spend': False
+'vin_sz': 1
+'vout_sz': 2
+'confirmations': 0
+'inputs': [{'prev_hash': 'e31e3efa6225aa650c1a45b1a9d3f24b1963fe98658044520e13bccf9213b6df'
+	    'output_index': 1
+	    'script': '483045022100fade6e8ffa85466558cbecdbdc94ef8e8bd50770fb83f07bfd167ede813febb20220162bcb3fe2e04188268e768a6d13a6701a84ca9e5a4adb672cee72aa36764cf3012103a43dc4bbd37c88b6375994eef4f0e2c5a7cea3a8cb80878f3bfe4159a6081953'
+	    'output_value': 71800076566
+	    'sequence': 4294967294
+	    'addresses': ['n1Zi77qHQtGQHn65SSaaEVp2hpXS9kdwdK']
+	    'script_type': 'pay-to-pubkey-hash', 'age': 0}]
+'outputs': [{'value': 71633139776
+	     'script': '76a914780a023f733b9439400e40301e491fbe7a5590ac88ac'
+	     'addresses': ['mrTfNVicJBj15GiaW1a8Gu8CDGJLSshNHW']
+ 	     'script_type': 'pay-to-pubkey-hash'}
+	    {'value': 166823790
+	     'script': '76a914c209ebbd76f9e19d789afdbe13c0743d00f4585288ac'
+	     'addresses': ['myCwGajvhU9EYGRc9g14ygaAZDxfyNgtDi']
+	     'script_type': 'pay-to-pubkey-hash'}]
+'confirmed': None

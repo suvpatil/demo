@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      {% if category == 'address' %}
+        <h1>Address: {{ search_id }}</h1>
+      {% elif category == 'block' %}
+        <h1>Block: #{{ search_id }}</h1>
+      {% elif category == 'tx' %}
+        <h1>Transaction: {{ search_id }}</h1>
+      {% else %}
+        <h1>Explorer</h1>
+      {% endif %}
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="box box-info"></div>
+      <br>
+        <form class="login101-form validate-form" action="" method="post">
+          {{ form.hidden_tag() }}
+
+          <div class="wrap-input101 validate-input m-b-10" data-validate = "Please enter a valid number">
+            {{ form.search(id="search-bar", class="input101", value="", autocomplete="off", style="background-color:#e3eeec; font-style:italic;", placeholder="Search the blockchain for an address, block hash, block height or transaction ID", size=36) }}
+            {% for error in form.search.errors %}
+              <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+          </div>
+
+        </form>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <h4 style="color: white;" align="center">{{ message }}</h4>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      <br>
+      <br>
+      <!-- Main row -->
+      <div class="row">
+        <!-- Left col -->
+        <section class="col-lg-7 connectedSortable">
+
+          <!-- TABLE: LEFT -->
+          <div class="box box-info" style='color:white;'>
+            <div id="left-box-header" class="box-header with-border" style='color:white;'>
+              <h3 id="left-box-title" class="box-title"></h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table id="left-table" class="table no-margin">
+                  <thead>
+                    <tr>
+                    {% if category == None and search_id == None %}
+                      <th>Hash</th>
+                      <th>Height</th>
+                      <th>Age</th>
+                      <th>Transactions</th>
+                      <th>Size (kB)</th>
+                    {% else %}
+                      <th>Summary</th>
+                      <th></th> 
+                    {% endif %}
+                    </tr>
+                  </thead>
+                  <tbody id="left-body">
+
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+
+        </section>
+
+        <!-- right col -->
+        <section class="col-lg-5 connectedSortable ui-sortable">
+          <!-- TABLE: RIGHT -->
+          {% if category != 'address' and category != 'tx' %}
+          <div class="box box-info" style='color:white;'>
+            <div id="right-box-header" class="box-header with-border" style='color:white;'>
+              <h3 id="right-box-title" class="box-title"></h3>
+            </div>
+            <!-- /.box-header -->
+            
+            <div class="box-body">
+              <div class="table-responsive">
+                <table id="right-table" class="table no-margin">
+                  <thead>
+                  
+                  <tr>
+                    {% if category == 'address' %}
+                      <th>Transactions</th>
+                      <th></th>
+                    {% elif category == 'block' %}
+                      <th>Hashes</th>
+                      <th></th>
+                    {% elif category == 'tx' %}
+                    {% else %}
+                      <th>Transaction ID</th>
+                    {% endif %}
+                  </tr>
+                  
+                  </thead>
+                  <tbody id="right-body">
+
+                  </tbody>
+                </table>
+
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+            
+          </div>
+          {% endif %}
+          <!-- /.box -->
+
+          {% if category != None and search_id != None %}
+          <!-- TABLE: BOTTOM -->
+          <div class="box box-info" style='color:white;'>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table id="bottom-table" class="table no-margin">
+                  <thead>
+                    <tr>
+                    {% if category == 'tx' %}
+                      <th>Inputs and Outputs</th>
+                      <th></th> 
+                    {% else %}
+                      <th>Transactions</th>
+                      <th></th> 
+                    {% endif %}
+                    </tr>
+                  </thead>
+                  <tbody id="bottom-body">
+
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+          {% endif %}
+
+        </section>
+        
+      </div>
+      <!-- /.row (main row) -->
+
+      {% if category == 'address' %}
+        <script>
+        $(document).ready(function() {
+          $('#left-box-header').remove();
+          $('#right-box-header').remove();
+          getData('address');
+        });
+        </script>
+      {% elif category == 'block' %}
+        <script>
+        $(document).ready(function() {
+          $('#left-box-header').remove();
+          $('#right-box-header').remove();
+          getData('block');
+        });
+        </script>
+      {% elif category == 'tx' %}
+        <script>
+        $(document).ready(function() {
+          $('#left-box-header').remove();
+          $('#right-box-header').remove();
+          getData('tx');
+        });
+        </script>
+      {% else %}
+        <script>
+        $(document).ready(function() {
+          $('#left-box-title').html("<strong>Latest Blocks </strong><i id='left-loading' class='fa fa-spinner fa-spin' style='font-size:24px'></i>");
+          $('#right-box-title').html("<strong>Latest Transactions </strong><i id='right-loading' class='fa fa-spinner fa-spin' style='font-size:24px'></i>");
+          getBlocks();
+          $('#left-loading').remove();
+          getTxs();
+          $('#right-loading').remove();
+          setInterval(function() {
+            getBlocks();
+            getTxs();
+          },
+          1000
+          );
+        });
+        </script>
+      {% endif %}
+
+      <script>
+      function getBlocks() {
+        $.getJSON($SCRIPT_ROOT + "/get_blocks", function(data) {
+          $('#left-body').empty();
+          var dataResult = data.result;
+          for (index in dataResult) {
+            var row = dataResult[index];
+            var tableRow = $("<tr />");
+            $('#left-table').append(tableRow);
+            tableRow.append($("<td><u><a href='/explorer/block/" + row['block_hash'] + "' class='id-link'>" + row['block_hash'].substring(0,40) + ".. </a><u></td>"));
+            tableRow.append($("<td>" + row['block_height'] + "</td>"));
+            tableRow.append($("<td>" + row['block_time'] + "</td>"));
+            tableRow.append($("<td>" + row['block_txs'] + "</td>"));
+            tableRow.append($("<td>" + row['block_size'] + "</td>"));
+          }
+        });
+      }
+
+      function getTxs() {
+        $.getJSON($SCRIPT_ROOT + "/get_mempool", function(data) {
+          $('#right-body').empty();
+          var dataResult = data.result;
+          console.log(dataResult);
+          for (index in dataResult) {
+            var row = dataResult[index];
+            var tableRow = $("<tr />");
+            $('#right-table').append(tableRow);
+            tableRow.append($("<td><u><a href='/explorer/tx/" + row + "' class='id-link'>" + row.substring(0,50) + ".. </a></u></td>"));
+          }
+        });
+      }
+
+      function shiftTables(category, dataResult) {
+        var rightTable = new Object();
+        var bottomTable = new Object();
+        if (category == 'address') {
+          bottomTable['txrefs'] = dataResult['txrefs'];
+          bottomTable['unconfirmed_txrefs'] = dataResult['unconfirmed_txrefs'];
+          delete bottomTable['txrefs'];
+          delete bottomTable['unconfirmed_txrefs'];
+        }
+        if (category == 'block') {
+          rightTable['hash'] = dataResult['hash'];
+          rightTable['mrkl_root'] = dataResult['mrkl_root'];
+          rightTable['prev_block'] = dataResult['prev_block'];
+          bottomTable['txids'] = dataResult['txids'];
+          delete dataResult['hash'];
+          delete dataResult['mrkl_root'];
+          delete dataResult['nextblockhash'];
+          delete dataResult['prev_block'];
+          delete dataResult['txids'];
+          delete dataResult['prev_block_url'];
+          delete dataResult['tx_url'];
+          delete dataResult['next_txids'];
+        }
+        if (category == 'tx') {
+          bottomTable['inputs'] = dataResult['inputs'];
+          bottomTable['outputs'] = dataResult['outputs'];
+          delete dataResult['inputs'];
+          delete dataResult['outputs'];
+          delete dataResult['addresses'];
+        }
+        newTables = [dataResult, rightTable, bottomTable];
+        return newTables;
+      }
+
+      function getData(category) {
+        $.getJSON($SCRIPT_ROOT + "/get_data", function(data) {
+          var dataResult = data.result;
+          var newTables = shiftTables(category, dataResult);
+          for (index in newTables[0]) {
+            var row = newTables[0][index];
+            var tableRow = $("<tr />");
+            $('#left-table').append(tableRow);
+            tableRow.append($("<td>" + index + "</td>"));
+            if (index == 'blockhash') {
+              tableRow.append($("<td><u><a href='/explorer/block/" + row + "' class='id-link'>" + row + "</a></u></td>"));
+            } else {
+              tableRow.append($("<td>" + row + "</td>"));
+            }
+          }
+          for (index in newTables[1]) {
+            var row = newTables[1][index];
+            var tableRow = $("<tr />");
+            $('#right-table').append(tableRow);
+            tableRow.append($("<td>" + index + "</td>"));
+            if (index == 'hash' || index == 'nextblockhash' && row != '' || index == 'prev_block') {
+              tableRow.append($("<td><u><a href='/explorer/block/" + row + "' class='id-link'>" + row.substring(0,35) + ".. </a></u></td>"));
+            } else {
+              tableRow.append($("<td>" + row.substring(0,35) + ".. </td>"));
+            }
+          }
+          for (index in newTables[2]) {
+            var row = newTables[2][index]; 
+            if (category == 'block') {
+              for (item in row) {
+                var rowItem = row[item];
+                var tableRow = $("<tr />");
+                $('#bottom-table').append(tableRow);
+                tableRow.append($("<td><u><a href='/explorer/tx/" + rowItem + "' class='id-link'>" + rowItem.substring(0,50) + ".. </a></u></td>"));
+              }
+            } else if (category == 'address' || category == 'tx') {
+              for (item in row) {
+                var rowItem = JSON.stringify(row[item]);
+                var tableRow = $("<tr />");
+                $('#bottom-table').append(tableRow);
+                tableRow.append($("<td>" + rowItem + "</td>"));
+              }
+            }
+          }
+        });
+      }
+      </script>
+
+    </section>
+    <!-- /.content -->
+
+
+
+  </div>
+{% endblock %}

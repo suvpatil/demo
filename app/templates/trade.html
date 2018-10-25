@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>Trade</h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="box box-info" style='color:white;'></div>
+
+      <!-- Main row -->
+      <div class="row">
+        <!-- Left col -->
+        <div class="col-md-8">
+          
+          
+        <!-- TradingView Widget BEGIN -->
+        <div class="box box-success">
+          <div id="tradingview_e07e6" class="box-body no-padding" style="height: 600px;"></div>
+            <div class="row">
+              <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+              <script type="text/javascript">
+                new TradingView.widget( {
+                  "autosize": true,
+                  "symbol": "BITFINEX:BTCUSD",
+                  "interval": "D",
+                  "timezone": "Etc/UTC",
+                  "theme": "Dark",
+                  "style": "1",
+                  "locale": "en",
+                  "toolbar_bg": "#f1f3f6",
+                  "enable_publishing": false,
+                  "hide_top_toolbar": false,
+                  "save_image": false,
+                  "container_id": "tradingview_e07e6"
+                });
+              </script>
+            </div>
+        </div>
+        <!-- TradingView Widget END -->
+
+          <!-- /.row -->
+        </div>
+        <!-- /.col -->
+
+
+        
+        <div class="col-md-4">
+            <div class="box box-default bg-aqua">
+                <div class="box-header with-border">
+                  <h3 class="box-title" style="color:white;"><strong>New Order</strong></h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body" style="height: 343px;">
+                  <form class="login101-form validate-form" action="" method="post">
+                    {{ form.hidden_tag() }}
+    
+                    {% for subfield in form.option %}
+                      {{ subfield }}
+                      <h4><strong>{{ subfield.label }}</strong></h4>
+                      <br>
+                    {% endfor %}
+                    {% for error in form.option.errors %}
+                      <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+    
+                    <div class="wrap-input101 validate-input m-b-10" data-validate = "Please enter a valid number">
+                      {{ form.btc_amount(id="trade-amount", class="input101", value="", autocomplete="off", style="background-color:#e3eeec", placeholder="Amount (BTC)", size=36) }}
+                      {% for error in form.btc_amount.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                      {% endfor %}
+                    </div>
+    
+                    <div class="wrap-input101 validate-input m-b-10">
+                      {{ form.price(id="trade-price", class="input101", value="", style="background-color:#979797", size=36, disabled=True) }}
+                    </div>
+    
+                    <div class="wrap-input101 validate-input m-b-10" data-validate = "Please enter a valid number">
+                      {{ form.total(id="trade-total", class="input101", value="Total: $0", style="background-color:#979797", size=36, disabled=True) }}
+                    </div>
+    
+                    <div class="container-login101-form-btn p-t-10">
+                      {{ form.trade(id="trade-button", class="login101-form-btn") }}
+                    </div>
+
+                  </form>
+                  {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                      {% for message in messages %}
+                        <h4 style="color: white;" align="center">{{ message }}</h4>
+                      {% endfor %}
+                    {% endif %}
+                  {% endwith %}
+                </div>
+                <!-- /.box-body -->
+
+                <script>
+                  $(document).ready(function() {
+                    var ws = new WebSocket('wss://api.bitfinex.com/ws/');
+                    ws.onopen = function() {
+                      ws.send(JSON.stringify( {
+                        "event": "subscribe",
+                        "channel": "book",
+                        "pair": "BTCUSD",
+                        "prec": "P0"
+                      }));
+                    };
+                    var askVolume = 0;
+                    var bidVolume = 0;
+                    // Get data from Bitfinex, then build an orderbook Object 
+                    ws.onmessage = function(msg) {
+                      var response = JSON.parse(msg.data);
+                      // Bitcoin price
+                      var price = response[1];
+                      if (price != 'hb') {
+                        if (response.length == 4) {
+                          // number of orders at this price
+                          var count = response[2];
+                          // amount of BTC available at this price ( negative means Ask, positive Bid )
+                          var amount = response[3];
+                          const numberWithCommas = function(x) {
+                            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                          }
+                          if (amount != 0) {
+                            if (count != 0) {
+                              if (amount < 0) {
+                                askVolume = Math.round(askVolume - (price * amount));
+                              } else {
+                                bidVolume = Math.round(bidVolume + (price * amount));
+                              }
+                            } else {
+                              if (amount < 0) {
+                                askVolume = Math.round(askVolume + (price * amount));
+                              } else {
+                                bidVolume = Math.round(bidVolume - (price * amount));
+                              }
+                            }
+                            if (askVolume < 0) {
+                              askVolume = 0;
+                            }
+                            if (bidVolume < 0) {
+                              bidVolume = 0;
+                            }
+                            var totalVolume = askVolume + bidVolume;
+                            var askPercentage = Math.round((askVolume / totalVolume) * 100);
+                            var bidPercentage = Math.round((bidVolume / totalVolume) * 100);
+                            var askBar = askPercentage.toString() + "%"
+                            var bidBar = bidPercentage.toString() + "%"
+                            $('#ask-volume').text("$" + numberWithCommas(askVolume));
+                            $('#bid-volume').text("$" + numberWithCommas(bidVolume));
+                            $('#ask-bar').css("width", askBar);
+                            $('#bid-bar').css("width", bidBar);
+                          }
+                        }
+                      }
+                    };
+                  });
+                </script>
+
+                <script>
+                  $(document).ready(function() {
+                    $("#trade-amount").keyup(function() {
+                      var tradeAmount = $("#trade-amount").val();
+                      var lastNumber = $("#trade-price").val().replace('Price: ', '');
+                      var last = parseFloat(lastNumber.substring(1).replace(/,/g, ''));
+                      var tradeTotal = tradeAmount * last;
+                      const numberWithCommas = function(x) {
+                        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                      }
+                      $('#trade-total').val("Total: $" + numberWithCommas(tradeTotal));
+                    });
+                  });
+                </script>
+        
+                <script>
+                  $(document).ready(function() {
+                    $("input[name='option']").change(function() {
+                      var tradeValue = $('input[name=option]:checked').val();
+                      if (tradeValue == "Buy") {
+                        $('#trade-price').css("background-color", "#809688");
+                        $('#trade-total').css("background-color", "#809688");
+                      } else {
+                        $('#trade-price').css("background-color", "#927070");
+                        $('#trade-total').css("background-color", "#927070");
+                      }
+                    });
+                  });
+                </script>
+
+                <div class="box-footer no-padding">
+
+                </div>
+                <!-- /.footer -->
+              </div>
+              <!-- /.box -->
+          <!-- Info Boxes Style 2 -->
+          <div class="info-box bg-red">
+            <span class="info-box-icon"><h3><strong>Asks</strong></h3></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Volume</span>
+              <span class="info-box-number" id="ask-volume"></span>
+
+              <div class="progress">
+                <div class="progress-bar" id="ask-bar"></div>
+              </div>
+              <span id="ask-price" class="progress-description"></span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+          <div class="info-box bg-yellow">
+            <span class="info-box-icon"><h3><strong>Bids</strong></h3></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Volume</span>
+              <span class="info-box-number" id="bid-volume"></span>
+
+              <div class="progress">
+                <div class="progress-bar" id="bid-bar"></div>
+              </div>
+              <span id="bid-price" class="progress-description"></span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{% endblock %}

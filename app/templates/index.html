@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>Dashboard</h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="box box-info" style='color:white;'></div>
+      
+      <!-- Small boxes (Stat box) -->
+      <div class="row">
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-aqua" style="height: 220px;">
+            <div class="inner">
+              <h3>Balances</h3>
+              <h4 id="balance_btc"></h4>
+              <h4 id="balance_usd"></h4>
+              <hr>
+
+              <!-- TAKE CORRECT HTML FROM TEMPORARY SCRIPT ? -->
+              <h4 id="balance_total"></h4>
+              <!-- TAKE CORRECT HTML FROM TEMPORARY SCRIPT ? -->
+              <br>
+            </div>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+
+          <!-- Websocket prices from Bitfinex -->
+          <!-- small box -->
+          <div class="small-box bg-green" style="height: 220px;">
+            <div class="inner">
+              <h3>BTC/USD</h3>
+              <h3 id="last"></h3>
+              <br>
+              
+              <h4 id="daily-change"><strong>Change (24h): </strong></h4>
+              <br>
+
+
+            </div>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-red" style="height: 220px;">
+            <div class="inner">
+              <h3>Portfolio</h3>
+              <h4 id="pnl"></h4>
+              <h4 id="benchmark"></h4>
+              <h4 id="alpha"></h4>
+              <h4 id="thing"></h4>
+              <br>
+              <br>
+            </div>
+          </div>
+        </div>
+        <!-- ./col -->
+        <!-- ./col -->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-yellow" style="height: 220px;">
+            <div class="inner">
+              <h3>News</h3>
+              <div id="rss-feeds"></div>
+              <script>
+              $(document).ready(function($) {
+                $("#rss-feeds").rss("https://www.coindesk.com/feed/",
+                {
+                  limit: 3,
+                  entryTemplate: '<li><a href="{url}" class="rss-link" target="_blank" style="font-size: 13px;">{title}</a></li>'
+                });
+              });
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.row -->
+      <!-- Main row -->
+      <div class="row">
+        <!-- Left col -->
+        <section class="col-lg-7 connectedSortable">
+
+          <!-- TABLE: Latest activity -->
+          <div class="box box-info" style='color:white;'>
+            <div class="box-header with-border" style='color:white;'>
+              <h3 class="box-title"><strong>Latest Activity</strong></h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table class="table no-margin">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+
+                  {% for row in table %}
+                    <tr>
+                      {% if row[6] != '' %}
+                        <td><a href="{{ '/explorer/block/' + row[6] }}" class="id-link"><u>{{ row[0] }}</u></a></td>
+                      {% else %}
+                        <td><a class="id-link">{{ row[0] }}</a></td>
+                      {% endif %}
+                      <td>{{ row[2] }}</td>
+                      <td>{{ row[3] }}</td>
+                      {% if row[4] == 'Buy' %}
+                        <td><span class="label label-warning">{{ row[4] }}</span></td>
+                      {% elif row[4] == 'Sell' %}
+                        <td><span class="label label-danger">{{ row[4] }}</span></td>
+                      {% else %}
+                        <td><span class="label label-success">{{ row[4] }}</span></td>
+                      {% endif %}
+                      <td>
+                        <div class="sparkbar" data-color="#00a65a" data-height="20">{{ row[5] }}</div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer clearfix">
+              <a href="{{ url_for('history') }}" class="btn btn-sm btn-default btn-flat pull-right"><strong>View All</strong></a>
+            </div>
+            <!-- /.box-footer -->
+          </div>
+          <!-- /.box -->
+
+        </section>
+
+        <!-- right col -->
+        <section class="col-lg-5 connectedSortable ui-sortable">
+
+          <!-- small box -->
+          <div class="small-box" style="height: 338px; background-color: rgb(184, 184, 184);">
+
+        <!-- TradingView Widget BEGIN -->
+
+          <div id="tradingview_e07e6" class="box-body no-padding" style="height: 337px;"></div>
+            <div class="row">
+              <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+              <script type="text/javascript">
+                new TradingView.widget( {
+                  "autosize": true,
+                  "symbol": "BITFINEX:BTCUSD",
+                  "interval": "D",
+                  "timezone": "Etc/UTC",
+                  "theme": "Dark",
+                  "style": "1",
+                  "locale": "en",
+                  "toolbar_bg": "#f1f3f6",
+                  "enable_publishing": false,
+                  "hide_top_toolbar": true,
+                  "save_image": false,
+                  "container_id": "tradingview_e07e6"
+                });
+              </script>
+            </div>
+
+        <!-- TradingView Widget END -->
+
+          </div>
+        
+        </section>
+
+      </div>
+      <!-- /.row (main row) -->
+
+    </section>
+    <!-- /.content -->
+  </div>
+{% endblock %}

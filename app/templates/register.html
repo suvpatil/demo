@@ -1,0 +1,61 @@
+{% extends "base-login.html" %}
+
+{% block content %}
+
+				<form class="login100-form validate-form" action="" method="post">
+					{{ form.hidden_tag() }}
+					<div class="login-logo">
+						<img src="static/img/HSBC_Logo.png" alt="AVATAR">
+					</div>
+
+					<span>
+						<h2 class="login-title">Digital Vault</h2>
+					</span>
+					
+					<div class="wrap-input100 validate-input m-b-10" data-validate = "First name is required">
+						<br>
+						{{ form.first_name(class="input100", placeholder="First name", size=36) }}
+						{% for error in form.first_name.errors %}
+							<span style="color: red;">[{{ error }}]</span>
+						{% endfor %}
+					</div>
+
+					<div class="wrap-input100 validate-input m-b-10" data-validate = "Last name is required">
+						{{ form.last_name(class="input100", placeholder="Last name", size=36) }}
+						{% for error in form.last_name.errors %}
+							<span style="color: red;">[{{ error }}]</span>
+						{% endfor %}
+					</div>
+
+					<div class="wrap-input100 validate-input m-b-10" data-validate = "Username is required">
+						{{ form.username(class="input100", placeholder="Username", size=36) }}
+						{% for error in form.username.errors %}
+							<span style="color: red;">[{{ error }}]</span>
+						{% endfor %}
+					</div>
+
+					<div class="wrap-input100 validate-input m-b-10" data-validate = "Password is required">
+						{{ form.password(class="input100", placeholder="Password", size=36) }}
+						{% for error in form.password.errors %}
+							<span style="color: red;">[{{ error }}]</span>
+						{% endfor %}
+					</div>
+
+					<div class="container-login100-form-btn p-t-10">
+						{{ form.register(class="login100-form-btn") }}
+					</div>
+
+					<div class="text-center w-full">
+						<br>
+						<br>
+						<a class="txt1" href="{{ url_for('login') }}">
+							Login
+							<i class="fa fa-long-arrow-right"></i>						
+						</a>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+	{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>History</h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="box box-info" style='color:white;'></div>
+
+      <!-- /.row -->
+      <!-- Main row -->
+      <div class="row">
+        <!-- Left col -->
+        <section class="col-md-12 connectedSortable">
+
+          <!-- TABLE: Recent activity -->
+          <div class="box box-info" style='color:white;'>
+
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table class="table no-margin" style="font-size:16px">
+                  <thead>
+                  <tr>
+                    {% for header in table[0][:8] %}
+                      <th>{{ header }}</th>
+                    {% endfor %}
+                  </tr>
+                  </thead>
+                  <tbody>
+
+                  {% for row in table[1:] %}
+                    <tr>
+                      {% if row[8] != '' %}
+                        <td><a href="{{ '/explorer/block/' + row[8] }}" class="id-link"><u>{{ row[0] }}</u></a></td>
+                      {% else %}
+                        <td><a class="id-link">{{ row[0] }}</a></td>
+                      {% endif %}
+                      <td>{{ row[1] }}</td>
+                      <td>{{ row[2] }}</td>
+                      {% if row[3] == 'Buy' %}
+                        <td><span class="label label-warning">{{ row[3] }}</span></td>
+                      {% elif row[3] == 'Sell' %}
+                        <td><span class="label label-danger">{{ row[3] }}</span></td>
+                      {% else %}
+                        <td><span class="label label-success">{{ row[3] }}</span></td>
+                      {% endif %}
+                      <td>
+                        <div class="sparkbar" data-color="#00a65a" data-height="20">{{ row[4] }}</div>
+                      </td>
+                      <td>
+                        <div class="sparkbar" data-color="#00a65a" data-height="20">{{ row[5] }}</div>
+                      </td>
+                      <td>
+                        <div class="sparkbar" data-color="#00a65a" data-height="20">{{ row[6] }}</div>
+                      </td>
+                      <td>
+                        <div class="sparkbar" data-color="#00a65a" data-height="20">{{ row[7] }}</div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer clearfix">
+              <a href="{{ url_for('history_xlsx') }}" class="btn btn-sm btn-default btn-flat pull-right"><strong>Export to Excel  <i class="fas fa-file-excel"></i></strong></i></a>
+            </div>
+            <!-- /.box-footer -->
+
+          </div>
+          <!-- /.box -->
+
+        </section>
+        <!-- right col -->
+      </div>
+      <!-- /.row (main row) -->
+
+    </section>
+    <!-- /.content -->
+  </div>
+{% endblock %}
